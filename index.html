@@ -436,55 +436,61 @@
     const savePct = hasDiscount ? Math.round(((compare - price) / compare) * 100) : 0;
     const imgs = DETAIL_IMAGES.length ? DETAIL_IMAGES : ['https://placehold.co/500x500?text=No+Image'];
     document.getElementById("detail-body").innerHTML = `
-      <div class="detail-thumb-main" id="detail-thumb-main">
-        <img src="${imgs[DETAIL_IMG_IDX]}" alt="${p.name}" onerror="this.onerror=null;this.src='https://placehold.co/500x500?text=No+Image';">
-        ${imgs.length > 1 ? `
-          <button class="gallery-nav prev" onclick="detailChangeImage(-1)">‹</button>
-          <button class="gallery-nav next" onclick="detailChangeImage(1)">›</button>
-        ` : ""}
-      </div>
-      ${imgs.length > 1 ? `
-        <div class="detail-thumb-strip">
-          ${imgs.map((url, i) => `<img src="${url}" class="${i === DETAIL_IMG_IDX ? "active" : ""}" onclick="detailSetImage(${i})" onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=No+Image';">`).join("")}
-        </div>
-      ` : ""}
-      <h2 class="detail-name">${p.name}</h2>
-      ${p.sku ? `<div class="detail-sku">SKU: ${p.sku}</div>` : ""}
-      <div class="price-block" style="margin-top:8px;">
-        ${hasDiscount ? `<span class="price-old">${CURRENCY} ${compare.toLocaleString()}</span>` : ""}
-        <div class="price-now-row" style="justify-content:flex-start;">
-          <span class="price" style="font-size:19px;">${CURRENCY} ${price.toLocaleString()}</span>
-          ${hasDiscount ? `<span class="save-pct">Save ${savePct}%</span>` : ""}
-        </div>
-      </div>
-      ${outOfStock ? `<p class="detail-desc" style="color:#DC2626; font-weight:700;">Out of Stock</p>` : `
-        <div class="detail-qty-row">
-          <div class="stepper">
-            <button onclick="detailChangeQty(-1)">−</button>
-            <span id="detail-qty">${DETAIL_QTY}</span>
-            <button onclick="detailChangeQty(1)">+</button>
+      <div class="detail-main-grid">
+        <div class="detail-media">
+          <div class="detail-thumb-main" id="detail-thumb-main">
+            <img src="${imgs[DETAIL_IMG_IDX]}" alt="${p.name}" onerror="this.onerror=null;this.src='https://placehold.co/500x500?text=No+Image';">
+            ${imgs.length > 1 ? `
+              <button class="gallery-nav prev" onclick="detailChangeImage(-1)">‹</button>
+              <button class="gallery-nav next" onclick="detailChangeImage(1)">›</button>
+            ` : ""}
           </div>
+          ${imgs.length > 1 ? `
+            <div class="detail-thumb-strip">
+              ${imgs.map((url, i) => `<img src="${url}" class="${i === DETAIL_IMG_IDX ? "active" : ""}" onclick="detailSetImage(${i})" onerror="this.onerror=null;this.src='https://placehold.co/100x100?text=No+Image';">`).join("")}
+            </div>
+          ` : ""}
         </div>
-        <div class="btn-row" style="margin-top:14px;">
-          <button class="add-btn" onclick="handleAddToCart('${p.id}')">Add to Cart</button>
-          <button class="buy-btn" onclick="handleBuyNow('${p.id}')">Buy Now</button>
+        <div class="detail-info">
+          <h2 class="detail-name">${p.name}</h2>
+          ${p.sku ? `<div class="detail-sku">SKU: ${p.sku}</div>` : ""}
+          <div class="price-block" style="margin-top:8px;">
+            ${hasDiscount ? `<span class="price-old">${CURRENCY} ${compare.toLocaleString()}</span>` : ""}
+            <div class="price-now-row" style="justify-content:flex-start;">
+              <span class="price" style="font-size:19px;">${CURRENCY} ${price.toLocaleString()}</span>
+              ${hasDiscount ? `<span class="save-pct">Save ${savePct}%</span>` : ""}
+            </div>
+          </div>
+          ${outOfStock ? `<p class="detail-desc" style="color:#DC2626; font-weight:700;">Out of Stock</p>` : `
+            <div class="detail-qty-row">
+              <div class="stepper">
+                <button onclick="detailChangeQty(-1)">−</button>
+                <span id="detail-qty">${DETAIL_QTY}</span>
+                <button onclick="detailChangeQty(1)">+</button>
+              </div>
+            </div>
+            <div class="btn-row" style="margin-top:14px;">
+              <button class="add-btn" onclick="handleAddToCart('${p.id}')">Add to Cart</button>
+              <button class="buy-btn" onclick="handleBuyNow('${p.id}')">Buy Now</button>
+            </div>
+          `}
+          ${renderAskQuestion(p)}
+          ${p.description ? `
+            <div class="detail-section">
+              <h3 class="detail-section-title">Description</h3>
+              <p class="detail-desc">${p.description}</p>
+            </div>
+          ` : ""}
+          ${p.specifications ? `
+            <div class="detail-section">
+              <h3 class="detail-section-title">Specifications</h3>
+              <ul class="detail-specs-list">
+                ${p.specifications.split("\n").map(line => line.trim()).filter(Boolean).map(line => `<li>${line}</li>`).join("")}
+              </ul>
+            </div>
+          ` : ""}
         </div>
-      `}
-      ${renderAskQuestion(p)}
-      ${p.description ? `
-        <div class="detail-section">
-          <h3 class="detail-section-title">Description</h3>
-          <p class="detail-desc">${p.description}</p>
-        </div>
-      ` : ""}
-      ${p.specifications ? `
-        <div class="detail-section">
-          <h3 class="detail-section-title">Specifications</h3>
-          <ul class="detail-specs-list">
-            ${p.specifications.split("\n").map(line => line.trim()).filter(Boolean).map(line => `<li>${line}</li>`).join("")}
-          </ul>
-        </div>
-      ` : ""}
+      </div>
       ${renderRelatedProducts(p)}
     `;
     attachMainImageGestures();
@@ -2013,6 +2019,83 @@
   @media (min-width: 700px) {
     #checkout-modal, #confirm-modal, #track-modal, #refund-modal, #contact-modal { align-items: center; }
     .sheet { border-radius: 20px; }
+  }
+
+  /* ===================== DESKTOP: PRODUCT DETAIL PAGE ===================== */
+  @media (min-width: 900px) {
+    #detail-modal { background: #F7F7F8; }
+    .detail-page {
+      max-width: 1180px;
+      padding-bottom: 60px;
+    }
+    .detail-page-header {
+      max-width: 1180px; margin: 0 auto; padding: 18px 28px;
+    }
+    .detail-page-header .brand { font-size: 19px; }
+    .detail-page #detail-body { padding: 32px 28px 0; }
+
+    .detail-main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      gap: 48px;
+      align-items: start;
+    }
+
+    .detail-media {
+      position: sticky;
+      top: 24px;
+    }
+    .detail-thumb-main {
+      aspect-ratio: 1;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .detail-thumb-strip {
+      margin-bottom: 0;
+    }
+    .detail-thumb-strip img {
+      width: 68px; height: 68px; border-radius: 10px; flex-shrink: 0;
+    }
+
+    .detail-info { padding-top: 4px; }
+    .detail-name { font-size: 26px; line-height: 1.25; margin-bottom: 8px; }
+    .detail-sku { font-size: 13px; margin-bottom: 10px; }
+    .price-block { margin-top: 4px !important; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .price-block .price { font-size: 28px !important; }
+    .detail-qty-row { margin-top: 20px; }
+    .btn-row {
+      flex-direction: row;
+      gap: 14px;
+      margin-top: 18px !important;
+      max-width: 460px;
+    }
+    .btn-row button { padding: 15px 0; font-size: 15px; border-radius: 12px; }
+    .detail-section { margin-top: 24px; padding-top: 18px; max-width: 620px; }
+    .detail-section-title { font-size: 16px; }
+    .detail-desc { font-size: 14.5px; line-height: 1.7; }
+
+    .detail-related, .fbt-section { max-width: 1180px; margin-left: auto; margin-right: auto; padding-left: 0; padding-right: 0; }
+    .detail-related { margin-top: 48px; padding-top: 32px; }
+    .detail-related-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+    .detail-page .site-footer { margin-top: 40px; padding: 40px 20px 60px; }
+  }
+
+  @media (min-width: 1240px) {
+    .detail-page { max-width: 1280px; }
+    .detail-page-header, .detail-page #detail-body { max-width: 1280px; }
+    .detail-related, .fbt-section { max-width: 1280px; }
+  }
+
+  /* ===================== DESKTOP: STORE / LISTING PAGE ===================== */
+  @media (min-width: 900px) {
+    header { padding: 16px 28px; }
+    .brand { font-size: 19px; }
+    .hero, .category-tabs, #grid, .site-footer > * { max-width: 1180px; }
+    #grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px 20px; padding: 4px 28px 40px; }
+    .category-tabs { padding: 20px 28px 6px; }
+    .hero { padding: 18px 28px 0; }
   }
 </style>
 </head>
